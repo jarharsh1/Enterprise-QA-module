@@ -1,0 +1,18 @@
+from app.config import settings
+
+print("AWS Access Key ID:", settings().aws_access_key_id)
+print("AWS Secret Access Key:", settings().aws_secret_access_key)
+print("AWS Region:", settings().aws_region)
+print("S3 Bucket:", settings().s3_bucket)
+print("Bedrock Embed Model:", settings().bedrock_embed_model)
+print("Bedrock Chat Model:", settings().bedrock_chat_model)
+print("Embed Dimension:", settings().embed_dim)
+print("Pinecone API Key:", settings().pinecone_api_key)
+print("Pinecone Index Name:", settings().pinecone_index_name)
+print("Pinecone Cloud:", settings().pinecone_cloud)
+print("Pinecone Region:", settings().pinecone_region)
+print("Pinecone Ready Timeout:", settings().pinecone_ready_timeout)
+print("Database URL:", settings().database_url)
+print("Minimum Relevance:", settings().min_relevance)
+print("HITL Enabled:", settings().hitl_enabled)
+print("Memory Turns:", settings().memory_turns)
