@@ -2,7 +2,7 @@
 
 An enterprise knowledge copilot being built to let employees search organizational documents, ask follow-up questions, and receive grounded answers with citations. The target system combines RAG, LangGraph, guardrails, human-in-the-loop approvals (HITL), and GlassFlow Rius observability.
 
-**Current stage:** Infrastructure and application foundation. The diagrams below describe the **target architecture**, not a deployed system.
+**Current stage:** Phase 1 complete (environment, cloud configuration, PostgreSQL schema and initializer, shared AWS/Bedrock clients, Pinecone setup). Phase 2 code has now landed — document ingestion worker, Pinecone retrieval, conversation memory, deterministic guardrails and a LangGraph chat pipeline — plus the Phase 3 Rius observability module. This code is **implemented but not yet verified**: several blocking defects remain (see the [progress checkpoint](development_steps/07-progress-and-validation.md)), and HITL approval routing is not yet wired into the graph. The diagrams below describe the **target architecture**, not a deployed system.
 
 ## Target application architecture
 
@@ -90,9 +90,9 @@ The Bedrock smoke test is `python Test/test.py` (use compatible model IDs). Fast
 
 | Phase | Scope | Status |
 | --- | --- | --- |
-| 1 | Environment, cloud setup, PostgreSQL, AWS clients, Pinecone | In progress |
-| 2 | Ingestion, RAG, memory, guardrails, LangGraph and HITL | Planned |
-| 3 | Rius observability and tracing | Planned |
+| 1 | Environment, cloud setup, PostgreSQL, AWS clients, Pinecone | Complete |
+| 2 | Ingestion, RAG, memory, guardrails, LangGraph and HITL | Code landed; fixes and verification pending (HITL not yet wired) |
+| 3 | Rius observability and tracing | Observability module landed; fixes and verification pending |
 | 4 | FastAPI, browser UI and integration | Planned |
 | 5 | CORS, automated tests and end-to-end validation | Planned |
 | 6 | Docker, GitHub Actions, ECR, EC2 deployment | Planned |
