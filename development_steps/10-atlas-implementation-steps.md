@@ -12,20 +12,20 @@ The 26 steps below retain the supplied Atlas implementation guide's sequence. St
 | 4 | infra/schema.sql | Documents, chat_messages, approvals, feedback, audit_events | Implemented |
 | 5 | app/db.py | Connection and audit helpers | Implemented |
 | 6 | scripts/init_db.py | Initialize and verify five tables | Implemented; execution unverified |
-| 7 | app/aws.py | Shared AWS clients, S3 operations, Bedrock chat and embeddings | Partial: cached client only; standalone Bedrock test exists |
-| 8 | app/vector.py | Pinecone auto-create, upsert, similarity search | Pending |
+| 7 | app/aws.py | Shared AWS clients, S3 operations, Bedrock chat and embeddings | Client factory done; embed()/answer() wrappers added but broken (wrong Bedrock client/API, Titan payload vs Cohere model, `embedding_dimensions` typo, session-token field still missing) |
+| 8 | app/vector.py | Pinecone auto-create, upsert, similarity search | Implemented; describe/create, tenant namespaces, ACL-filtered search present; readiness-timeout loop is a no-op; unverified live |
 
-**Next development step:** Finish Step 7, including configuration fixes, shared model wrappers and S3 helpers; then implement Step 8. The original design uses Titan V2/Nova Lite, whereas current code uses different default model IDs. Decide which compatible models to use before writing wrappers.
+**Next development step:** The embedding/answer wrappers (Step 7) exist but do not match the configured model or the correct Bedrock API — correct these and the session-token field first. The original design uses Titan V2/Nova Lite, whereas current code defaults to Cohere Embed v4 / Nova 2 Lite. Lock one compatible model set before fixing the wrappers.
 
 ## Phase 2 — Document ingestion and RAG
 
 | Step | File | What to develop | Status |
 | --- | --- | --- | --- |
-| 9 | worker/ingest.py | Download S3 object, extract text, chunk, embed, upsert, update PostgreSQL status; explicitly invoke worker | Pending |
-| 10 | app/rag.py | Retrieval and grounded-answer helpers; inspect actual implementation rather than assume re-export | Pending |
-| 11 | app/memory.py | Persist and retrieve recent conversation turns | Pending; SQL table exists |
-| 12 | app/guardrails.py | Deterministic input/output checks for injection, secrets and unsafe responses | Pending |
-| 13 | app/graph.py | LangGraph orchestration: checks, memory/retrieval, generation, HITL routing and output checks | Pending |
+| 9 | worker/ingest.py | Download S3 object, extract text, chunk, embed, upsert, update PostgreSQL status; explicitly invoke worker | Implemented; S3 fetch, PDF/DOCX/text parse, chunking, batched upsert, `pending→processing→ready/failed` transitions and audit present; blocked at runtime by the broken embed() and observability initialize() |
+| 10 | app/rag.py | Retrieval and grounded-answer helpers; inspect actual implementation rather than assume re-export | Implemented as a one-line re-export of `app.graph.chat` (retrieval/answer logic lives in app/graph.py and app/aws.py) |
+| 11 | app/memory.py | Persist and retrieve recent conversation turns | Implemented; history/save_turn/list_messages present; `history()` has a `craeted_at` column typo that fails at runtime |
+| 12 | app/guardrails.py | Deterministic input/output checks for injection, secrets and unsafe responses | Implemented; input injection and sensitive-output checks done; `check_evidence` is a pass-through and is not called by the graph |
+| 13 | app/graph.py | LangGraph orchestration: checks, memory/retrieval, generation, HITL routing and output checks | LangGraph pipeline implemented (guard → retrieve → generate/no_evidence → validate); HITL routing NOT implemented; retrieve() mishandles the Pinecone response and depends on an undefined principal object |
 
 Target ingestion flow: S3 → worker → extraction/chunking → Bedrock embeddings → Pinecone → PostgreSQL status. Target chat flow: user question → input checks → history and relevant chunks → generation → output checks → cited answer. Sensitive actions create approval records; approval itself does not execute deletion or policy modification.
 
@@ -33,10 +33,10 @@ Target ingestion flow: S3 → worker → extraction/chunking → Bedrock embeddi
 
 | Step | File / component | What to develop | Status |
 | --- | --- | --- | --- |
-| 14 | app/observability.py | Optional tracing, service name, API key, privacy-safe settings | Pending |
-| 15 | app/graph.py | Trace agent nodes, latency and errors | Pending |
-| 16 | app/aws.py, app/vector.py | Instrument model calls and vector operations | Pending |
-| 17 | worker/ingest.py | Trace ingestion stages and failures | Pending |
+| 14 | app/observability.py | Optional tracing, service name, API key, privacy-safe settings | Implemented but broken: `trace()` returns None (breaks every decorated import) and `initialize()` uses non-existent `os.get_env` / wrong `os.get_blocking` |
+| 15 | app/graph.py | Trace agent nodes, latency and errors | `@trace` applied to all graph nodes; effectively disabled until the decorator bug is fixed |
+| 16 | app/aws.py, app/vector.py | Instrument model calls and vector operations | `@trace` applied to embed/answer/upsert/search; same decorator-bug dependency |
+| 17 | worker/ingest.py | Trace ingestion stages and failures | `@trace` on process_s3_key and `initialize()` called at import; blocked by the observability bugs |
 | 18 | Rius dashboard | Verify test traces; avoid exporting secrets or sensitive content | Pending |
 
 ## Phase 4 — FastAPI and UI

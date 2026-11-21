@@ -1,6 +1,6 @@
 # Development handbook — Atlas Enterprise AI
 
-This handbook separates **what has been implemented** from **what we intend to build**. The code checkpoint is based on [dea3d34](https://github.com/jarharsh1/Enterprise-QA-module/commit/dea3d34dc312f0364d12c871eaaacfd73b16cd80) (18 November 2026). The target design follows the Atlas project overview, supplied setup and implementation guides, and application/CI-CD architecture references.
+This handbook separates **what has been implemented** from **what we intend to build**. The code checkpoint is based on [d6e342d](https://github.com/jarharsh1/Enterprise-QA-module/commit/d6e342d) (21 November 2026). The target design follows the Atlas project overview, supplied setup and implementation guides, and application/CI-CD architecture references.
 
 ## Part A — Completed development record
 
@@ -27,7 +27,7 @@ This handbook separates **what has been implemented** from **what we intend to b
 
 See the [main README](../README.md#target-application-architecture) for simplified target application and deployment diagrams.
 
-At the current checkpoint only the settings, database helpers, schema initializer, Bedrock smoke test and AWS client factory contain implementation. RAG, Pinecone integration, ingestion, memory orchestration, guardrails, LangGraph, observability, HTTP API and UI are still scaffolded. Do not confuse a planned capability or source-guide description with working code in this repository.
+At the current checkpoint, Phase 1 (settings, database helpers, schema initializer, Bedrock smoke test, AWS client factory) plus the Phase 2 and Phase 3 code (Pinecone integration, ingestion worker, memory, guardrails, the LangGraph chat pipeline, RAG re-export and the Rius observability module) are all present in source. However, the Phase 2/3 code is **not yet runnable** — several import-time and first-call defects are documented in the [progress checkpoint](07-progress-and-validation.md#blocking-issues-found-in-source-review-phase-23). HITL approval routing, the HTTP API and the UI are still scaffolded. Do not confuse code being present, or a source-guide description, with verified working code in this repository.
 
 ## How to maintain this handbook
 
