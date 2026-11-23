@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "postgresql://enterprise_rdbms_user:usEUH4uNjzIVkYPnfyG631z5Uxzv1wor@dpg-dbu2jct6e07s73bkgr10-a/enterprise_rdbms_db",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "enterprise-qa-module",
+            "database": "enterprise_rdbms_db",
+            "username": "enterprise_rdbms_user"
+        }
+    ]
+}
